@@ -634,6 +634,7 @@
   </main>
 
   <script>
+    <script>
     let currentVariant = "V3";
     const variantNotes = {
       V1: "Basic conversational summary mode",
@@ -645,7 +646,7 @@
       ll: {
         topic: "Learner's Licence (LL) Documents & Steps",
         portal: "Sarathi Parivahan (MoRTH) — https://sarathi.parivahan.gov.in/",
-        citation: "[Source: MoRTH / Central Motor Vehicles Rules & Sarathi Parivahan Guidelines]",
+        citation: "",
         docs: [
           "Proof of Age (Birth Certificate / Passport / 10th Marksheet)",
           "Proof of Address (Aadhaar / Voter ID / Utility Bill / Passport)",
@@ -753,7 +754,7 @@
 
       const box = document.getElementById("inspectorBox");
       if (!lastQuery) {
-        box.textContent = `Active Variant: ${currentVariant}\nJurisdiction: ${jur}\nGuardrail: PII/Aadhaar redaction active\n\nWaiting for query... Select V1, V2, or V3 and ask a question to inspect the exact RAG retrieval payload and system prompt constraints.`;
+        box.textContent = `Active Variant: ${currentVariant}\nJurisdiction: ${jur}\nGuardrail: ID redaction active\n\nWaiting for query... Select V1, V2, or V3 and ask a question to inspect the exact RAG retrieval payload and system prompt constraints.`;
         return;
       }
       box.textContent =
@@ -761,7 +762,7 @@
 [JURISDICTION] ${jur}
 [RETRIEVED DOC_CHUNK] topic="${matchedKey}"
 [SYSTEM GUARDRAILS]
-- Do not store or echo raw 12-digit Aadhaar/sensitive numbers.
+- Do not store or echo raw 12-digit sensitive ID numbers.
 - Separate central procedure steps from state/RTO variations.
 - Flag conflicting or time-sensitive rules explicitly.
 [LAST QUERY] "${lastQuery}"`;
@@ -782,14 +783,14 @@
     }
 
     function detectPii(text) {
-      const aadhaarRegex = /\b\d{4}[\s-]?\d{4}[\s-]?\d{4}\b/;
-      return aadhaarRegex.test(text);
+      const idRegex = /\b\d{4}[\s-]?\d{4}[\s-]?\d{4}\b/;
+      return idRegex.test(text);
     }
 
     function matchTopic(lower) {
       if (lower.includes("learner") || lower.includes("ll") || lower.includes("licence") || lower.includes("license")) return "ll";
       if (lower.includes("nsp") || lower.includes("scholarship") || lower.includes("post-matric")) return "nsp";
-      if (lower.includes("aadhaar") || lower.includes("address")) return "aadhaar";
+      if (lower.includes("aadhaar") || lower.includes("aadhar") || lower.includes("address")) return "aadhaar";
       if (lower.includes("expired") || lower.includes("conflict") || lower.includes("renewal")) return "expired_dl";
       return "general";
     }
@@ -804,7 +805,7 @@
         return {
           type: "guardrail",
           title: "Privacy & Security Guardrail Triggered",
-          body: `For your safety, please do not enter full Aadhaar numbers or personal ID numbers in chat.\n\nDetected & masked input: "${redacted}"\n\n• Never share your 12-digit Aadhaar number, OTPs, or bank/application numbers with public chat tools.\n• Check your Aadhaar or application status directly on official portals (such as myAadhaar or Sarathi Parivahan) using your own verified login.`
+          body: `For your safety, please do not enter full 12-digit ID numbers or personal ID numbers in chat.\n\nDetected & masked input: "${redacted}"\n\n• Never share sensitive ID numbers, OTPs, or bank/application numbers with public chat tools.\n• Check your status directly on official portals (such as myAadhaar or Sarathi Parivahan) using your own verified login.`
         };
       }
 
@@ -820,7 +821,7 @@
         return {
           type: "bot",
           title: `JanSahayak (${currentVariant} • ${jur})`,
-          body: `I can help with procedures across Education & Scholarships (e.g., NSP), Identity Documents (e.g., Aadhaar address updates), and Driving Licences & Transport (e.g., Learner's Licence or DL renewal).\n\nTry one of the quick-test prompts below or ask about a specific procedure to populate your document checklist.`
+          body: `I can help with procedures across Education & Scholarships (e.g., NSP), Identity Documents (e.g., address updates), and Driving Licences & Transport (e.g., Learner's Licence or DL renewal).\n\nTry one of the quick-test prompts below or ask about a specific procedure to populate your document checklist.`
         };
       }
 
@@ -869,10 +870,29 @@
       container.scrollTop = container.scrollHeight;
     }
 
-    function runPrompt(text) {
+    async function runPrompt(text) {
       appendMessage(text, true);
-      const reply = buildResponse(text);
-      setTimeout(() => appendMessage(reply, false), 200);
+      const jur = document.getElementById("jurisdictionSelect").value;
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            query: text,
+            variant: currentVariant,
+            jurisdiction: jur
+          })
+        });
+        if (!res.ok) throw new Error("Backend unavailable");
+        const data = await res.json();
+        renderChecklist(data.docs || []);
+        document.getElementById("inspectorBox").textContent = data.inspector;
+        appendMessage({ type: data.type, title: data.title, body: data.body }, false);
+      } catch (err) {
+        const reply = buildResponse(text);
+        appendMessage(reply, false);
+      }
     }
 
     function resetChat() {
@@ -901,6 +921,7 @@
     });
 
     updateInspector();
+  </script>
   </script>
 </body>
 </html>
