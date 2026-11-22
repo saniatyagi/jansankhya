@@ -3,17 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Jansahayak Chatbot Assistant</title>
+  <title>JanSahayak — Evidence-Grounded Civic Procedure Assistant</title>
   <style>
     :root {
-      --bg-color: #0f172a;
-      --chat-bg: #1e293b;
-      --user-msg: #2563eb;
-      --bot-msg: #334155;
-      --text-color: #f8fafc;
-      --muted-text: #94a3b8;
-      --border-color: #334155;
-      --accent: #22c55e;
+      --bg: #f1f5f9;
+      --panel: #ffffff;
+      --panel-soft: #f8fafc;
+      --navy: #0f172a;
+      --blue: #1d4ed8;
+      --blue-dark: #1e3a8a;
+      --green: #15803d;
+      --green-bg: #dcfce7;
+      --amber-bg: #fef3c7;
+      --amber-text: #92400e;
+      --red-bg: #fee2e2;
+      --red-text: #991b1b;
+      --text: #0f172a;
+      --muted: #475569;
+      --border: #cbd5e1;
     }
 
     * {
@@ -24,248 +31,876 @@
     }
 
     body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
-      padding: 16px;
     }
 
-    .chat-container {
-      width: 100%;
-      max-width: 720px;
-      height: 90vh;
-      background-color: var(--chat-bg);
-      border-radius: 16px;
-      border: 1px solid var(--border-color);
+    /* Top Header */
+    .topbar {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
       display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.45);
-    }
-
-    .chat-header {
-      padding: 18px 24px;
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      background: rgba(15, 23, 42, 0.6);
+      gap: 12px;
     }
 
-    .chat-header h1 {
-      font-size: 1.1rem;
-      font-weight: 600;
+    .brand {
       display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .logo-badge {
+      background: var(--blue-dark);
+      color: #fff;
+      font-weight: 700;
+      padding: 8px 11px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .brand-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .brand-sub {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .pill-tag {
+      background: #eff6ff;
+      color: var(--blue);
+      border: 1px solid #bfdbfe;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+
+    .nav-controls {
+      display: flex;
+      flex-wrap: wrap;
       align-items: center;
       gap: 10px;
     }
 
-    .status-dot {
-      width: 10px;
-      height: 10px;
-      background-color: var(--accent);
-      border-radius: 50%;
-    }
-
-    .quick-prompts {
-      padding: 10px 20px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      border-bottom: 1px solid var(--border-color);
-      background: rgba(15, 23, 42, 0.35);
-    }
-
-    .chip {
-      background: #0f172a;
-      color: #e2e8f0;
-      border: 1px solid #475569;
-      border-radius: 999px;
-      padding: 6px 12px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .chip:hover {
-      background: #334155;
-    }
-
-    .chat-messages {
-      flex: 1;
-      padding: 24px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .message {
-      max-width: 82%;
-      padding: 12px 16px;
-      border-radius: 14px;
-      line-height: 1.55;
-      font-size: 0.95rem;
-      white-space: pre-line;
-      word-wrap: break-word;
-    }
-
-    .message.bot {
-      background-color: var(--bot-msg);
-      align-self: flex-start;
-      border-bottom-left-radius: 4px;
-    }
-
-    .message.user {
-      background-color: var(--user-msg);
-      align-self: flex-end;
-      border-bottom-right-radius: 4px;
-    }
-
-    .chat-input-area {
-      padding: 16px 20px;
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      gap: 12px;
-      background: rgba(15, 23, 42, 0.6);
-    }
-
-    input[type="text"] {
-      flex: 1;
-      background-color: var(--bg-color);
-      border: 1px solid var(--border-color);
-      color: var(--text-color);
-      padding: 12px 16px;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      outline: none;
-    }
-
-    input[type="text"]:focus {
-      border-color: var(--user-msg);
-    }
-
-    button.send-btn {
-      background-color: var(--user-msg);
-      color: white;
-      border: none;
-      padding: 0 20px;
-      border-radius: 10px;
+    .mode-btn {
+      border: 1px solid var(--border);
+      background: var(--panel-soft);
+      color: var(--text);
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
     }
 
-    button.send-btn:hover {
-      opacity: 0.92;
+    .mode-btn.active {
+      background: var(--navy);
+      color: #fff;
+      border-color: var(--navy);
+    }
+
+    select.jurisdiction-select {
+      padding: 7px 11px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+
+    /* Variant Bar */
+    .variant-bar {
+      background: var(--panel-soft);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.82rem;
+    }
+
+    .variant-label {
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    .variant-btn {
+      padding: 6px 12px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .variant-btn.active {
+      background: var(--green);
+      color: #fff;
+      border-color: var(--green);
+    }
+
+    .variant-note {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    /* Main Grid */
+    .workspace {
+      max-width: 1280px;
+      margin: 18px auto;
+      padding: 0 20px 28px;
+      display: grid;
+      grid-template-columns: 1.55fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 960px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    }
+
+    .chat-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 620px;
+    }
+
+    .chat-top {
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--panel-soft);
+      font-size: 0.85rem;
+    }
+
+    .active-mode-badge {
+      background: var(--green-bg);
+      color: var(--green);
+      font-weight: 600;
+      font-size: 0.75rem;
+      padding: 3px 9px;
+      border-radius: 999px;
+    }
+
+    .messages {
+      flex: 1;
+      padding: 18px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-height: 430px;
+    }
+
+    .msg {
+      padding: 13px 16px;
+      border-radius: 12px;
+      line-height: 1.55;
+      font-size: 0.92rem;
+      white-space: pre-line;
+    }
+
+    .msg.bot {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      align-self: stretch;
+    }
+
+    .msg.user {
+      background: var(--blue);
+      color: #fff;
+      align-self: flex-end;
+      max-width: 82%;
+    }
+
+    .msg.guardrail {
+      background: var(--red-bg);
+      border: 1px solid #fca5a5;
+      color: var(--red-text);
+    }
+
+    .msg.conflict {
+      background: var(--amber-bg);
+      border: 1px solid #fcd34d;
+      color: var(--amber-text);
+    }
+
+    .msg-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+    }
+
+    .benchmarks {
+      padding: 12px 18px;
+      border-top: 1px solid var(--border);
+      background: var(--panel-soft);
+    }
+
+    .benchmarks-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .reset-link {
+      background: none;
+      border: none;
+      color: var(--blue);
+      text-decoration: underline;
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .chip:hover {
+      background: #eff6ff;
+      border-color: #93c5fd;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      padding: 14px 18px;
+      border-top: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .input-row input {
+      flex: 1;
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      font-size: 0.92rem;
+      outline: none;
+    }
+
+    .input-row input:focus {
+      border-color: var(--blue);
+    }
+
+    .ask-btn {
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      padding: 0 18px;
+      border-radius: 9px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Right Column */
+    .side-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .side-box {
+      padding: 16px 18px;
+    }
+
+    .side-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .side-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.84rem;
+      padding: 6px 0;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+
+    .checklist-item:last-child {
+      border-bottom: none;
+    }
+
+    .portal-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: var(--panel-soft);
+    }
+
+    .portal-card:last-child {
+      margin-bottom: 0;
+    }
+
+    .portal-name {
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    .portal-desc {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .visit-btn {
+      text-decoration: none;
+      background: #fff;
+      border: 1px solid var(--border);
+      color: var(--navy);
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 5px 10px;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+
+    .visit-btn:hover {
+      background: #eff6ff;
+    }
+
+    .inspector-box {
+      background: var(--navy);
+      color: #e2e8f0;
+      border-radius: 10px;
+      padding: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.76rem;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .eval-banner {
+      display: none;
+      margin: 0 20px 18px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      max-width: 1240px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .eval-banner.show {
+      display: block;
+    }
+
+    table.eval-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.84rem;
+    }
+
+    table.eval-table th,
+    table.eval-table td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+    }
+
+    table.eval-table th {
+      background: var(--panel-soft);
     }
   </style>
 </head>
 <body>
 
-  <div class="chat-container">
-    <div class="chat-header">
-      <h1><span class="status-dot"></span> Jansahayak Chatbot</h1>
-      <span style="font-size: 0.8rem; color: var(--muted-text);">Guided Assistant</span>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo-badge">JS</div>
+      <div>
+        <div class="brand-title">JanSahayak — Evidence-Grounded Civic Procedure Assistant</div>
+        <div class="brand-sub">Simplified, verified Indian government service procedures with source-grounded RAG &amp; Responsible AI guardrails</div>
+      </div>
+      <span class="pill-tag">Prompt Engineering Prototype • RAG + V1/V2/V3 Evaluator</span>
     </div>
 
-    <div class="quick-prompts">
-      <button class="chip" type="button" onclick="sendQuickPrompt('Start form')">Start Form</button>
-      <button class="chip" type="button" onclick="sendQuickPrompt('What is this portal for?')">About Portal</button>
-      <button class="chip" type="button" onclick="sendQuickPrompt('Help')">Help</button>
+    <div class="nav-controls">
+      <button class="mode-btn active" id="btnAssistant" type="button" onclick="setTab('assistant')">Citizen Assistant</button>
+      <button class="mode-btn" id="btnEval" type="button" onclick="setTab('eval')">Prompt Lab &amp; Evaluation</button>
+      <select class="jurisdiction-select" id="jurisdictionSelect" onchange="updateInspector()">
+        <option value="All India / Central" selected>Jurisdiction: All India / Central</option>
+        <option value="Uttar Pradesh">Jurisdiction: Uttar Pradesh</option>
+        <option value="Delhi NCT">Jurisdiction: Delhi NCT</option>
+        <option value="Maharashtra">Jurisdiction: Maharashtra</option>
+        <option value="Karnataka">Jurisdiction: Karnataka</option>
+      </select>
     </div>
+  </header>
 
-    <div class="chat-messages" id="chatMessages">
-      <div class="message bot">Namaste! Welcome to the Jansahayak Chatbot.
-I can help you fill out your details step-by-step or answer questions. Type "Start form" or click a quick button above to begin.</div>
-    </div>
-
-    <form class="chat-input-area" id="chatForm">
-      <input type="text" id="userInput" placeholder="Type your message or answer here..." autocomplete="off" required />
-      <button class="send-btn" type="submit">Send</button>
-    </form>
+  <div class="variant-bar">
+    <span class="variant-label">PROMPT VARIANT:</span>
+    <button class="variant-btn" data-v="V1" type="button" onclick="setVariant('V1')">V1: Basic</button>
+    <button class="variant-btn" data-v="V2" type="button" onclick="setVariant('V2')">V2: Structured</button>
+    <button class="variant-btn active" data-v="V3" type="button" onclick="setVariant('V3')">V3: Evidence-Grounded &amp; State-Aware</button>
+    <span class="variant-note" id="variantNote">Strict RAG grounding, State rules, Uncertainty flags &amp; Citations</span>
   </div>
 
-  <script>
-    const chatForm = document.getElementById("chatForm");
-    const userInput = document.getElementById("userInput");
-    const chatMessages = document.getElementById("chatMessages");
+  <section class="eval-banner" id="evalPanel">
+    <h3>Prompt Lab &amp; Evaluation (V1 vs. V2 vs. V3)</h3>
+    <p class="side-sub" style="margin-top:4px;">Switch prompt variants above and run quick-test prompts to compare how structure, citations, state awareness, and privacy guardrails behave.</p>
+    <table class="eval-table">
+      <thead>
+        <tr>
+          <th>Variant</th>
+          <th>Formatting</th>
+          <th>Source Grounding &amp; Uncertainty</th>
+          <th>Privacy / PII Guardrail</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>V1: Basic</strong></td>
+          <td>Short summary</td>
+          <td>Minimal citation detail</td>
+          <td>Flags visible ID numbers</td>
+        </tr>
+        <tr>
+          <td><strong>V2: Structured</strong></td>
+          <td>Numbered steps + checklist</td>
+          <td>Mentions relevant official portal</td>
+          <td>Warns against sharing ID numbers</td>
+        </tr>
+        <tr>
+          <td><strong>V3: Evidence-Grounded &amp; State-Aware</strong></td>
+          <td>Steps, state caveats, citations &amp; checklist</td>
+          <td>Explicit source citations + uncertainty / state rule flags</td>
+          <td>Blocks &amp; redacts Aadhaar / sensitive IDs</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
 
-    let step = 0;
-    const formData = {
-      fullName: "",
-      location: "",
-      purpose: ""
+  <main class="workspace">
+    <!-- Left Chat Panel -->
+    <div class="card chat-card">
+      <div class="chat-top">
+        <div><strong>JanSahayak Civic Assistant</strong></div>
+        <span class="active-mode-badge" id="activeModeBadge">Active Mode: V3 Evidence-Grounded</span>
+      </div>
+
+      <div class="messages" id="messages">
+        <div class="msg bot">
+          <div class="msg-meta">
+            <span>JanSahayak Assistant</span>
+            <span id="welcomeJurisdiction">All India / Central</span>
+          </div>
+          Namaste! 🙏 I am <strong>JanSahayak</strong>, your AI assistant for navigating Indian government services across <strong>Education &amp; Scholarships</strong>, <strong>Identity Documents</strong>, and <strong>Driving Licences &amp; Transport</strong>.
+
+          Select a State/UT above, switch between V1, V2, and V3 prompt engineering modes to evaluate output quality, or try one of the quick-test prompts below. Any required documents will automatically populate in your interactive checklist panel!
+        </div>
+      </div>
+
+      <div class="benchmarks">
+        <div class="benchmarks-head">
+          <span>⚡ QUICK-TEST BENCHMARK PROMPTS (CLICK TO RUN):</span>
+          <button class="reset-link" type="button" onclick="resetChat()">Reset Chat</button>
+        </div>
+        <div class="chips">
+          <button class="chip" type="button" onclick="runPrompt(&quot;Learner's Licence documents &amp; steps&quot;)">📄 Learner's Licence documents &amp; steps</button>
+          <button class="chip" type="button" onclick="runPrompt(&quot;NSP Post-Matric Scholarship eligibility&quot;)">🎓 NSP Post-Matric Scholarship eligibility</button>
+          <button class="chip" type="button" onclick="runPrompt(&quot;Aadhaar address update procedure&quot;)">🪪 Aadhaar address update procedure</button>
+          <button class="chip" type="button" onclick="runPrompt(&quot;Conflicting rule test: Expired DL renewal&quot;)">⚠️ Conflicting rule test: Expired DL renewal</button>
+          <button class="chip" type="button" onclick="runPrompt(&quot;Test Guardrail: Check my Aadhaar 1234-5678-9012&quot;)">🛡️ Test Guardrail: Check my Aadhaar 1234-5678-9012</button>
+        </div>
+      </div>
+
+      <form class="input-row" id="chatForm">
+        <input id="queryInput" type="text" placeholder="Ask about scholarships, Aadhaar/PAN/Voter ID, or Driving Licences..." autocomplete="off" required />
+        <button class="ask-btn" type="submit">Ask →</button>
+      </form>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="side-stack">
+      <div class="card side-box">
+        <div class="side-title">Interactive Document Checklist</div>
+        <div class="side-sub">Ask a procedure question (e.g., Learner's Licence or Aadhaar Update) to populate your interactive document checklist.</div>
+        <div id="checklistContainer">
+          <div class="checklist-item">
+            <span style="color:var(--muted);">No procedure selected yet. Click a quick-test prompt or ask a question to generate a checklist.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card side-box">
+        <div class="side-title">🏛️ Verified Official Portals</div>
+        <div class="side-sub">Direct authoritative links — never use third-party agents.</div>
+
+        <div class="portal-card">
+          <div>
+            <div class="portal-name">National Scholarship Portal (NSP)</div>
+            <div class="portal-desc">Central &amp; UGC/AICTE Scholarships • OTR</div>
+          </div>
+          <a class="visit-btn" href="https://scholarships.gov.in/" target="_blank" rel="noopener noreferrer">Visit ↗</a>
+        </div>
+
+        <div class="portal-card">
+          <div>
+            <div class="portal-name">UIDAI — myAadhaar Official</div>
+            <div class="portal-desc">Aadhaar Address Update, PVC Card &amp; Status</div>
+          </div>
+          <a class="visit-btn" href="https://myaadhaar.uidai.gov.in/" target="_blank" rel="noopener noreferrer">Visit ↗</a>
+        </div>
+
+        <div class="portal-card">
+          <div>
+            <div class="portal-name">Sarathi Parivahan (MoRTH)</div>
+            <div class="portal-desc">Learner's Licence, Permanent DL &amp; Renewal</div>
+          </div>
+          <a class="visit-btn" href="https://sarathi.parivahan.gov.in/" target="_blank" rel="noopener noreferrer">Visit ↗</a>
+        </div>
+
+        <div class="portal-card">
+          <div>
+            <div class="portal-name">National Govt Services Portal</div>
+            <div class="portal-desc">Unified Directory of Central &amp; State Services</div>
+          </div>
+          <a class="visit-btn" href="https://services.india.gov.in/" target="_blank" rel="noopener noreferrer">Visit ↗</a>
+        </div>
+
+        <div class="portal-card">
+          <div>
+            <div class="portal-name">ECI Voters' Service Portal</div>
+            <div class="portal-desc">Voter ID Form 6, Form 8 &amp; EPIC Download</div>
+          </div>
+          <a class="visit-btn" href="https://voters.eci.gov.in/" target="_blank" rel="noopener noreferrer">Visit ↗</a>
+        </div>
+      </div>
+
+      <div class="card side-box">
+        <div class="side-title">🔍 RAG &amp; PROMPT INSPECTOR (FACULTY VIEW)</div>
+        <div class="side-sub">Inspect the exact retrieved official context &amp; active system prompt rules injected into the LLM:</div>
+        <div class="inspector-box" id="inspectorBox">Waiting for query... Select V1, V2, or V3 and ask a question to inspect the exact RAG retrieval payload and system prompt constraints.</div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let currentVariant = "V3";
+    const variantNotes = {
+      V1: "Basic conversational summary mode",
+      V2: "Structured step-by-step procedural checklist mode",
+      V3: "Strict RAG grounding, State rules, Uncertainty flags & Citations"
     };
 
-    function appendMessage(text, sender) {
-      const msgDiv = document.createElement("div");
-      msgDiv.classList.add("message", sender);
-      msgDiv.textContent = text;
-      chatMessages.appendChild(msgDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
+    const knowledgeBase = {
+      ll: {
+        topic: "Learner's Licence (LL) Documents & Steps",
+        portal: "Sarathi Parivahan (MoRTH) — https://sarathi.parivahan.gov.in/",
+        citation: "[Source: MoRTH / Central Motor Vehicles Rules & Sarathi Parivahan Guidelines]",
+        docs: [
+          "Proof of Age (Birth Certificate / Passport / 10th Marksheet)",
+          "Proof of Address (Aadhaar / Voter ID / Utility Bill / Passport)",
+          "Passport-size photograph & digital signature",
+          "Form 1 (Physical Fitness Self-Declaration) / Form 1A (Medical Certificate if applicable)",
+          "Application fee payment receipt & LL test slot confirmation"
+        ],
+        steps: [
+          "Visit Sarathi Parivahan and select your State/UT.",
+          "Apply for New Learner's Licence (LL), fill Form 2 details, and upload age, address, and photo/signature documents.",
+          "Pay the prescribed fee and book a slot for the online/RTO Learner's Licence test (road signs & traffic rules).",
+          "Pass the test to download or receive your Learner's Licence (valid for 6 months; permanent DL application typically follows after 30 days)."
+        ],
+        caveat: "RTO test slots, online test availability, and local facilitation charges vary by State/RTO."
+      },
+      nsp: {
+        topic: "NSP Post-Matric Scholarship Eligibility",
+        portal: "National Scholarship Portal (NSP) — https://scholarships.gov.in/",
+        citation: "[Source: National Scholarship Portal (scholarships.gov.in) Scheme Guidelines]",
+        docs: [
+          "One-Time Registration (OTR) reference / Aadhaar-linked verification",
+          "Previous academic marksheet & current institution bonafide / admission proof",
+          "Income certificate issued by competent authority",
+          "Category / Caste / Domicile / Disability certificate (as applicable to scheme)",
+          "Active bank account details seeded with Aadhaar / DBT-enabled"
+        ],
+        steps: [
+          "Complete One-Time Registration (OTR) on the National Scholarship Portal.",
+          "Log in during the active scheme window and check scheme-specific income, course, and marks criteria.",
+          "Submit the Post-Matric application with required supporting certificates and institution verification.",
+          "Track application verification at Institute, State/Nodal, and PFMS disbursement stages."
+        ],
+        caveat: "Exact family income ceilings, cut-off dates, and category rules depend on the specific Central or State Post-Matric scheme."
+      },
+      aadhaar: {
+        topic: "Aadhaar Address Update Procedure",
+        portal: "UIDAI myAadhaar — https://myaadhaar.uidai.gov.in/",
+        citation: "[Source: UIDAI Aadhaar Enrolment & Update Guidelines (myaadhaar.uidai.gov.in)]",
+        docs: [
+          "Valid Proof of Address (PoA) document in applicant's name (or Head of Family PoA + Proof of Relationship)",
+          "Aadhaar number & registered mobile number for OTP verification",
+          "Applicable update fee (online via myAadhaar or at an Aadhaar Seva Kendra)"
+        ],
+        steps: [
+          "Log in to myAadhaar using your Aadhaar number and OTP on your registered mobile number.",
+          "Select 'Update Aadhaar Online' -> 'Address', enter the new address, and upload a valid Proof of Address document.",
+          "Pay the applicable fee and note the Service Request Number (SRN) to track status.",
+          "If your mobile number is not linked or you lack documents in your name, visit an Aadhaar Seva Kendra / enrolment centre."
+        ],
+        caveat: "Accepted PoA lists and fee rules are periodically updated by UIDAI; always verify current list on myAadhaar."
+      },
+      expired_dl: {
+        topic: "Conflicting Rule Test: Expired Driving Licence Renewal",
+        portal: "Sarathi Parivahan (MoRTH) — https://sarathi.parivahan.gov.in/",
+        citation: "[Source: Motor Vehicles Act / CMVR Renewal Provisions & State RTO Rules]",
+        docs: [
+          "Existing / expired Driving Licence details",
+          "Proof of age and address (as required by RTO)",
+          "Form 1 / Form 1A (Medical certificate is required if age is 40+ or for specific categories)",
+          "Renewal & late/additional fee receipt"
+        ],
+        steps: [
+          "Check your exact expiry date and grace period window on Sarathi Parivahan.",
+          "Submit a DL renewal application online via Sarathi Parivahan and upload required declarations/medical forms.",
+          "Note potential rule differences: renewals past grace periods or older licences may require additional scrutiny, fees, or a driving test depending on statute and state RTO enforcement."
+        ],
+        caveat: "CONFLICTING / STATE-DEPENDENT RULE FLAG: Grace periods, late fee rules, and whether a re-test applies after long expiry can differ between statutory provisions and individual State RTO interpretations. Confirm directly with your local RTO / Sarathi portal before relying on a single timeline."
+      }
+    };
+
+    function setTab(tab) {
+      const assistantBtn = document.getElementById("btnAssistant");
+      const evalBtn = document.getElementById("btnEval");
+      const evalPanel = document.getElementById("evalPanel");
+      if (tab === "eval") {
+        assistantBtn.classList.remove("active");
+        evalBtn.classList.add("active");
+        evalPanel.classList.add("show");
+      } else {
+        evalBtn.classList.remove("active");
+        assistantBtn.classList.add("active");
+        evalPanel.classList.remove("show");
+      }
     }
 
-    function getBotReply(rawInput) {
-      const input = rawInput.trim();
-      const lower = input.toLowerCase();
-
-      if (step === 1) {
-        formData.fullName = input;
-        step = 2;
-        return `Thanks, ${formData.fullName}. Which city, district, or state are you submitting this from?`;
-      }
-
-      if (step === 2) {
-        formData.location = input;
-        step = 3;
-        return `Got it (${formData.location}). What service, information, or support do you need today?`;
-      }
-
-      if (step === 3) {
-        formData.purpose = input;
-        step = 0;
-        return `Here is a summary of what you entered:\n• Name: ${formData.fullName}\n• Location: ${formData.location}\n• Request: ${formData.purpose}\n\nType "Start form" anytime if you want to submit another response.`;
-      }
-
-      if (lower.includes("start") || lower.includes("form")) {
-        step = 1;
-        return "Let's start your submission. First, what is your full name?";
-      }
-
-      if (lower.includes("portal") || lower.includes("jansankhya") || lower.includes("jansahayak")) {
-        return "This chatbot guides users step-by-step through sharing basic details and finding assistance. Type \"Start form\" to walk through the questions one by one.";
-      }
-
-      if (lower.includes("help")) {
-        return "You can:\n1. Type \"Start form\" to enter your Name, Location, and Request step-by-step.\n2. Ask \"What is this portal for?\" for an overview.\n3. Edit getBotReply() in index.html to add custom questions or fields.";
-      }
-
-      return `You said: "${input}". Type "Start form" to begin the guided questions, or type "Help" to see what I can do.`;
+    function setVariant(v) {
+      currentVariant = v;
+      document.querySelectorAll(".variant-btn").forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.v === v);
+      });
+      document.getElementById("variantNote").textContent = variantNotes[v];
+      const labels = {
+        V1: "Active Mode: V1 Basic",
+        V2: "Active Mode: V2 Structured",
+        V3: "Active Mode: V3 Evidence-Grounded"
+      };
+      document.getElementById("activeModeBadge").textContent = labels[v];
+      updateInspector();
     }
 
-    function handleUserMessage(message) {
-      appendMessage(message, "user");
-      setTimeout(() => {
-        const reply = getBotReply(message);
-        appendMessage(reply, "bot");
-      }, 350);
+    function updateInspector(lastQuery = "", matchedKey = "general") {
+      const jur = document.getElementById("jurisdictionSelect").value;
+      const welcomeJur = document.getElementById("welcomeJurisdiction");
+      if (welcomeJur) welcomeJur.textContent = jur;
+
+      const box = document.getElementById("inspectorBox");
+      if (!lastQuery) {
+        box.textContent = `Active Variant: ${currentVariant}\nJurisdiction: ${jur}\nGuardrail: PII/Aadhaar redaction active\n\nWaiting for query... Select V1, V2, or V3 and ask a question to inspect the exact RAG retrieval payload and system prompt constraints.`;
+        return;
+      }
+      box.textContent =
+`[PROMPT VARIANT] ${currentVariant}
+[JURISDICTION] ${jur}
+[RETRIEVED DOC_CHUNK] topic="${matchedKey}"
+[SYSTEM GUARDRAILS]
+- Do not store or echo raw 12-digit Aadhaar/sensitive numbers.
+- Separate central procedure steps from state/RTO variations.
+- Flag conflicting or time-sensitive rules explicitly.
+[LAST QUERY] "${lastQuery}"`;
     }
 
-    function sendQuickPrompt(text) {
-      handleUserMessage(text);
+    function renderChecklist(items) {
+      const container = document.getElementById("checklistContainer");
+      if (!items || !items.length) {
+        container.innerHTML = `<div class="checklist-item"><span style="color:var(--muted);">No procedure selected yet. Click a quick-test prompt or ask a question to generate a checklist.</span></div>`;
+        return;
+      }
+      container.innerHTML = items.map((doc, idx) => `
+        <label class="checklist-item">
+          <input type="checkbox" id="chk_${idx}" />
+          <span>${doc}</span>
+        </label>
+      `).join("");
     }
 
-    chatForm.addEventListener("submit", (e) => {
+    function detectPii(text) {
+      const aadhaarRegex = /\b\d{4}[\s-]?\d{4}[\s-]?\d{4}\b/;
+      return aadhaarRegex.test(text);
+    }
+
+    function matchTopic(lower) {
+      if (lower.includes("learner") || lower.includes("ll") || lower.includes("licence") || lower.includes("license")) return "ll";
+      if (lower.includes("nsp") || lower.includes("scholarship") || lower.includes("post-matric")) return "nsp";
+      if (lower.includes("aadhaar") || lower.includes("address")) return "aadhaar";
+      if (lower.includes("expired") || lower.includes("conflict") || lower.includes("renewal")) return "expired_dl";
+      return "general";
+    }
+
+    function buildResponse(rawQuery) {
+      const jur = document.getElementById("jurisdictionSelect").value;
+      const lower = rawQuery.toLowerCase();
+
+      if (detectPii(rawQuery)) {
+        const redacted = rawQuery.replace(/\b\d{4}[\s-]?\d{4}[\s-]?\d{4}\b/g, "XXXX-XXXX-XXXX");
+        updateInspector(redacted, "pii_guardrail_triggered");
+        return {
+          type: "guardrail",
+          title: "Privacy & Security Guardrail Triggered",
+          body: `For your safety, please do not enter full Aadhaar numbers or personal ID numbers in chat.\n\nDetected & masked input: "${redacted}"\n\n• Never share your 12-digit Aadhaar number, OTPs, or bank/application numbers with public chat tools.\n• Check your Aadhaar or application status directly on official portals (such as myAadhaar or Sarathi Parivahan) using your own verified login.`
+        };
+      }
+
+      const key = matchTopic(lower);
+      updateInspector(rawQuery, key);
+
+      if (key === "general") {
+        renderChecklist([
+          "Identity & Address proof (Aadhaar / Voter ID / Passport)",
+          "Relevant application or eligibility certificate",
+          "Official portal login credentials"
+        ]);
+        return {
+          type: "bot",
+          title: `JanSahayak (${currentVariant} • ${jur})`,
+          body: `I can help with procedures across Education & Scholarships (e.g., NSP), Identity Documents (e.g., Aadhaar address updates), and Driving Licences & Transport (e.g., Learner's Licence or DL renewal).\n\nTry one of the quick-test prompts below or ask about a specific procedure to populate your document checklist.`
+        };
+      }
+
+      const data = knowledgeBase[key];
+      renderChecklist(data.docs);
+
+      if (currentVariant === "V1") {
+        return {
+          type: "bot",
+          title: `${data.topic} (V1: Basic)`,
+          body: `${data.steps.slice(0, 2).join(" ")}\n\nPortal: ${data.portal}`
+        };
+      }
+
+      if (currentVariant === "V2") {
+        const stepLines = data.steps.map((s, i) => `${i + 1}. ${s}`).join("\n");
+        const docLines = data.docs.map((d) => `• ${d}`).join("\n");
+        return {
+          type: "bot",
+          title: `${data.topic} (V2: Structured • ${jur})`,
+          body: `Steps:\n${stepLines}\n\nDocuments:\n${docLines}\n\nOfficial Portal: ${data.portal}`
+        };
+      }
+
+      // V3: Evidence-Grounded & State-Aware
+      const stepLines = data.steps.map((s, i) => `${i + 1}. ${s}`).join("\n");
+      const docLines = data.docs.map((d) => `• ${d}`).join("\n");
+      return {
+        type: key === "expired_dl" ? "conflict" : "bot",
+        title: `${data.topic} (V3: Evidence-Grounded • ${jur})`,
+        body: `Procedure Steps:\n${stepLines}\n\nRequired Documents (added to checklist):\n${docLines}\n\nState & Rule Note (${jur}): ${data.caveat}\n\n${data.citation}\nOfficial Portal: ${data.portal}`
+      };
+    }
+
+    function appendMessage(res, isUser = false) {
+      const container = document.getElementById("messages");
+      const div = document.createElement("div");
+      if (isUser) {
+        div.className = "msg user";
+        div.textContent = res;
+      } else {
+        div.className = `msg bot ${res.type || ""}`;
+        div.innerHTML = `<div class="msg-meta"><span>${res.title}</span><span>${document.getElementById("jurisdictionSelect").value}</span></div>${res.body.replace(/</g, "&lt;").replace(/>/g, "&gt;")}`;
+      }
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function runPrompt(text) {
+      appendMessage(text, true);
+      const reply = buildResponse(text);
+      setTimeout(() => appendMessage(reply, false), 200);
+    }
+
+    function resetChat() {
+      const jur = document.getElementById("jurisdictionSelect").value;
+      document.getElementById("messages").innerHTML = `
+        <div class="msg bot">
+          <div class="msg-meta">
+            <span>JanSahayak Assistant</span>
+            <span id="welcomeJurisdiction">${jur}</span>
+          </div>
+          Namaste! 🙏 I am <strong>JanSahayak</strong>, your AI assistant for navigating Indian government services across <strong>Education &amp; Scholarships</strong>, <strong>Identity Documents</strong>, and <strong>Driving Licences &amp; Transport</strong>.
+
+          Select a State/UT above, switch between V1, V2, and V3 prompt engineering modes to evaluate output quality, or try one of the quick-test prompts below. Any required documents will automatically populate in your interactive checklist panel!
+        </div>`;
+      renderChecklist([]);
+      updateInspector();
+    }
+
+    document.getElementById("chatForm").addEventListener("submit", (e) => {
       e.preventDefault();
-      const message = userInput.value.trim();
-      if (!message) return;
-      userInput.value = "";
-      handleUserMessage(message);
+      const input = document.getElementById("queryInput");
+      const val = input.value.trim();
+      if (!val) return;
+      input.value = "";
+      runPrompt(val);
     });
-  </script>
 
+    updateInspector();
+  </script>
 </body>
 </html>
